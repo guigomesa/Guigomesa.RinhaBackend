@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  webapp:
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    ports:
+      - "5000:5000"
+    depends_on:
+      - postgres
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=rinha;Username=guigo;Password=rinha123"
+    volumes:
+      - .:/app
+
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_DB: rinha
+      POSTGRES_USER: guigo
+      POSTGRES_PASSWORD: rinha123
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

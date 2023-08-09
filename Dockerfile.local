@@ -1,0 +1,18 @@
+# Use the official .NET Core SDK image as the base image
+FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the project file to the working directory
+COPY Guigomesa.RinhaBackend.csproj .
+
+RUN dotnet restore
+
+COPY . .
+
+ENV ASPNETCORE_ENVIRONMENT Development
+
+EXPOSE 5000
+
+ENTRYPOINT ["dotnet", "run", "urls=http://localhost:5000", "watch", "--project", "Guigomesa.RinhaBackend.csproj"]
