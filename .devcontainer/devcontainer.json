@@ -1,0 +1,20 @@
+{
+	"name": "C# (.NET)",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "app",
+    "workspaceFolder": "/workspace",
+    "forwardPorts": [5000, 5432],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilot",
+				"ms-dotnettools.csharp",
+                "ms-azuretools.vscode-docker",
+                "adrianwilczynski.add-reference",
+                "formulahendry.dotnet",
+                "ms-dotnettools.vscode-dotnet-pack",
+                "ms-dotnettools.vscode-dotnet-runtime"
+			]
+		}
+    }
+}
