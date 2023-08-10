@@ -1,6 +1,6 @@
 {
 	"name": "C# (.NET)",
-    "dockerComposeFile": "docker-compose.yml",
+    "dockerComposeFile": "docker-compose.yaml",
     "service": "app",
     "workspaceFolder": "/workspace",
     "forwardPorts": [5000, 5432],
