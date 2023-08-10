@@ -14,7 +14,8 @@
                 "adrianwilczynski.add-reference",
                 "formulahendry.dotnet",
                 "ms-dotnettools.vscode-dotnet-pack",
-                "ms-dotnettools.vscode-dotnet-runtime"
+                "ms-dotnettools.vscode-dotnet-runtime",
+                "ms-ossdata.vscode-postgresql",
 			]
 		}
     }
