@@ -18,6 +18,5 @@ services:
       POSTGRES_DB: rinha
       POSTGRES_USER: guigo
       POSTGRES_PASSWORD: rinha123
-    network_mode: bridge
 volumes:
   postgres-data:
