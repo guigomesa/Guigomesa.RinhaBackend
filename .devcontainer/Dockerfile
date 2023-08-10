@@ -1,2 +1,1 @@
-ARG VARIANT="7.0"
-FROM mcr.microsoft.com/devcontainers/dotnet:${VARIANT}
+FROM mcr.microsoft.com/vscode/devcontainers/dotnet:7.0
