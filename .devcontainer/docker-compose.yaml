@@ -2,11 +2,11 @@ version: "3"
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: mcr.microsoft.com/devcontainers/dotnet:7.0
     volumes:
-      - .:/workspace
+         - ../..:/workspaces:cached
+    network_mode: service:rabbit
+    command: sleep infinity
 
   db:
     image: postgres:latest
@@ -17,9 +17,5 @@ services:
       POSTGRES_DB: rinha
       POSTGRES_USER: guigo
       POSTGRES_PASSWORD: rinha123
-
-    # Add "forwardPorts": ["5432"] to **devcontainer.json** to forward PostgreSQL locally.
-    # (Adding the "ports" property to this file will not forward from a Codespace.)
-
 volumes:
   postgres-data:
