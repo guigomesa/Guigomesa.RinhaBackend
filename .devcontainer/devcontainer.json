@@ -16,6 +16,8 @@
                 "ms-dotnettools.vscode-dotnet-pack",
                 "ms-dotnettools.vscode-dotnet-runtime",
                 "ms-ossdata.vscode-postgresql",
+                "ms-dotnettools.csdevkit",
+                "Fudge.auto-using"
 			]
 		}
     }
