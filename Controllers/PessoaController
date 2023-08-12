@@ -1,0 +1,51 @@
+using Microsoft.AspNetCore.Mvc;
+using Models;
+using Data;
+
+namespace Guigomesa.RinhaBackend.Controllers;
+
+
+[ApiController]
+[Route("[controller]")]
+public class PessoaController {
+    public RinhaContext Context { get; set; }
+
+    public PessoaController(RinhaContext context) {
+        Context = context;
+    }
+
+    public async Task<ActionResult> Get(Guid id) {
+        var pessoa = await Context.Pessoas.FindAsync(id);
+        if (pessoa == null) {
+            return NotFound();
+        }
+        return Ok(pessoa);
+    }
+    public async Task<ActionResult> Get(string termo) {
+        var pessoas = await Context.Pessoas
+
+        .Where(x => 
+        x.Apelido.Contains(termo) 
+        || x.Nome.Contains(termo)
+        || x.StacksDb.JsonContains(termo)
+        )
+        .Take(50)
+        .ToListAsync();
+
+        if (pessoas == null) {
+            return NotFound();
+        }
+
+        return Ok(pessoas);
+    }
+    public async Task<ActionResult> Post(Pessoa pessoa) {
+        await Context.Pessoas.AddAsync(pessoa);
+        await Context.SaveChangesAsync();
+        return CreatedAtRoute("GetPessoa", new { id = pessoa.Id }, pessoa);
+    }
+
+    [HttpGet("contagem-pessoas")]
+    public async Task<ActionResult> ContagemPessoas() {
+        return Ok(await Context.Pessoas.CountAsync());
+    }
+}
