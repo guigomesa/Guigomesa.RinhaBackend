@@ -2,7 +2,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json;
-using DTO;
 using System.Text.Json.Serialization;
 
 namespace Models
@@ -39,7 +38,8 @@ namespace Models
         }
 
         [NotMapped, JsonIgnore]
-        public DateTime NascimentoQuery {
+        public DateTime NascimentoQuery
+        {
             set => Nascimento = DateOnly.FromDateTime(value);
         }
 
@@ -59,13 +59,5 @@ namespace Models
             stacks.Add(stack);
             StacksDb = JsonDocument.Parse(JsonSerializer.Serialize(stacks));
         }
-
-        public List<String> GetStacks()
-        {
-            return
-             StacksDb?.Deserialize<List<String>>()
-             ?? new List<String>();
-        }
-
     }
 }

@@ -8,7 +8,6 @@ using System.Net;
 
 namespace Guigomesa.RinhaBackend.Controllers;
 
-
 [ApiController]
 [Route("Pessoas")]
 public class PessoasController : ControllerBase
@@ -20,16 +19,18 @@ public class PessoasController : ControllerBase
         Context = context;
     }
 
-    [HttpGet("{id}", Name=nameof(GetById))]
-    public async Task<ActionResult> GetById([FromRoute]Guid id) {
-         return await BuscarPorGuid(id);
+    [HttpGet("{id}", Name = nameof(GetById))]
+    public async Task<ActionResult> GetById([FromRoute] Guid id)
+    {
+        return await BuscarPorGuid(id);
     }
 
-    [HttpGet("", Name=nameof(GetByTermo))]
-    public async Task<ActionResult> GetByTermo([FromQuery] string termo) {
+    [HttpGet("", Name = nameof(GetByTermo))]
+    public async Task<ActionResult> GetByTermo([FromQuery] string termo)
+    {
         return await Listar(termo);
     }
-    
+
     private async Task<ActionResult> BuscarPorGuid(Guid id)
     {
         var pessoa = await Context.Pessoas.FindAsync(id);
@@ -46,14 +47,13 @@ public class PessoasController : ControllerBase
         DbTransaction transaction = null;
         try
         {
-            
             var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
             var logger = loggerFactory.CreateLogger("SQLLogger");
 
             connection = Context.Database.GetDbConnection();
             await connection.OpenAsync();
-            transaction = await  connection.BeginTransactionAsync();
-            var commandTimeout =  Context.Database.GetCommandTimeout();
+            transaction = await connection.BeginTransactionAsync();
+            var commandTimeout = Context.Database.GetCommandTimeout();
 
             const string QUERY = @"
             select 
@@ -70,14 +70,13 @@ public class PessoasController : ControllerBase
         ";
 
             var command = new CommandDefinition(QUERY,
-                new { 
-                    termo=$"%{termo}%",
-                    jsonTermo=$@"[""{termo}""]"
-                     },
+                new
+                {
+                    termo = $"%{termo}%",
+                    jsonTermo = $@"[""{termo}""]"
+                },
                 transaction,
                 commandTimeout: commandTimeout);
-
-                
 
             var pessoas = await connection.QueryAsync<Pessoa>(command);
 
@@ -97,7 +96,7 @@ public class PessoasController : ControllerBase
             }
             if (connection != null)
             {
-                
+
                 await connection.CloseAsync();
                 connection.Dispose();
             }
