@@ -72,23 +72,25 @@ public class PessoasController : ControllerBase
             const string QUERY = @"
             select 
                 p.""Id"",
-p.""Apelido"",
-p.""Nome"",
-p.""Nascimento"",
-p.""StacksDb"" as ""Stack""
+                p.""Apelido"",
+                p.""Nome"",
+                p.""Nascimento"",
+                p.""StacksDb"" as ""StacksQuery""
              from public.""Pessoas"" p
             where p.""Nome"" ilike @termo
             or p.""Apelido"" ilike @termo
-            or p.""StacksDb"" @> @jsonTermo
+            or p.""StacksDb""::jsonb @> @jsonTermo::jsonb
             limit 50
         ";
         //    or p.""StacksDb"" @> @jsonTermo
 
-            var jsonTermo = $@"[""{termo}""]::json";
+            var jsonTermo = $@"[""{termo}""]";
             var command = new CommandDefinition(QUERY,
                 new { termo, jsonTermo },
                 transaction,
                 commandTimeout: commandTimeout);
+
+                
 
             var pessoas = await connection.QueryAsync<Pessoa>(command);
 

@@ -28,12 +28,25 @@ namespace Models
         public JsonDocument StacksDb { get; set; } = JsonDocument.Parse("[]");
 
         [NotMapped]
-        [JsonPropertyName("stacks")]
+        [JsonPropertyName("Stacks")]
         public List<string> Stacks
         {
             get => StacksDb?.Deserialize<List<string>>() ?? new List<string>();
-            set => StacksDb = JsonDocument.Parse(JsonSerializer.Serialize(value));
+            set
+            {
+                StacksDb = JsonDocument.Parse(JsonSerializer.Serialize(value));
+            }
         }
+
+        [NotMapped, JsonIgnore]
+        public string StacksQuery
+        {
+            set
+            {
+                Stacks = JsonSerializer.Deserialize<List<string>>(value);
+            }
+        }
+
 
         public void AddAtack(string stack)
         {
