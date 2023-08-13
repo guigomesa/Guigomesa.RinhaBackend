@@ -22,6 +22,6 @@ COPY --from=build /app/out .
 
 ENV ASPNETCORE_ENVIRONMENT Production
 
-EXPOSE 5000
+EXPOSE 9999
 
-ENTRYPOINT ["dotnet", "Guigomesa.RinhaBackend.dll", "urls=http://localhost:5000"]
+ENTRYPOINT ["dotnet", "Guigomesa.RinhaBackend.dll", "urls=http://localhost:9999"]
