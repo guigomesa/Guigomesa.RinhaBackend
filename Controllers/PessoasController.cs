@@ -2,15 +2,15 @@ using Models;
 using Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Net;
 using System.Data.Common;
 using Dapper;
+using System.Net;
 
 namespace Guigomesa.RinhaBackend.Controllers;
 
 
 [ApiController]
-[Route("[controller]")]
+[Route("Pessoas")]
 public class PessoasController : ControllerBase
 {
     public RinhaContext Context { get; set; }
@@ -20,29 +20,41 @@ public class PessoasController : ControllerBase
         Context = context;
     }
 
-    [HttpGet("{id:guid}")]
-    [HttpGet("")]
-    public async Task<ActionResult> Get([FromQuery] string? termo = null, Guid? id = null)
-    {
-        try
-        {
-            if (id.HasValue && id.Value != Guid.Empty)
-            {
-                return await BuscarPorGuid(id.Value);
-            }
-            if (!string.IsNullOrEmpty(termo))
-            {
-                return await Listar(termo);
-            }
-
-            return StatusCode((int)HttpStatusCode.MethodNotAllowed);
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, ex.Message);
-        }
-
+    [HttpGet("{id}", Name=nameof(GetById))]
+    public async Task<ActionResult> GetById([FromRoute]Guid id) {
+         return await BuscarPorGuid(id);
     }
+
+    [HttpGet("", Name=nameof(GetByTermo))]
+    public async Task<ActionResult> GetByTermo([FromQuery] string termo) {
+        return await Listar(termo);
+    }
+    
+
+
+    // [HttpGet("{id:guid}", Name="GetById")]
+    // [HttpGet("", Name="GetByTermo")]
+    // public async Task<ActionResult> Get([FromQuery] string? termo = null, [FromRoute]Guid? id = null)
+    // {
+    //     try
+    //     {
+    //         if (id.HasValue && id.Value != Guid.Empty)
+    //         {
+    //             return await BuscarPorGuid(id.Value);
+    //         }
+    //         if (!string.IsNullOrEmpty(termo))
+    //         {
+    //             return await Listar(termo);
+    //         }
+
+    //         return StatusCode((int)HttpStatusCode.MethodNotAllowed);
+    //     }
+    //     catch (Exception ex)
+    //     {
+    //         return StatusCode(500, ex.Message);
+    //     }
+
+    // }
 
     private async Task<ActionResult> BuscarPorGuid(Guid id)
     {
@@ -118,13 +130,17 @@ public class PessoasController : ControllerBase
     }
 
     [HttpPost("")]
-    public async Task<ActionResult> Post([FromBody] Pessoa pessoa)
+    public async Task<IActionResult> Post([FromBody] Pessoa pessoa)
     {
         try
         {
             await Context.Pessoas.AddAsync(pessoa);
             await Context.SaveChangesAsync();
-            return CreatedAtRoute("Get", new { id = pessoa.Id }, pessoa);
+
+            Response.StatusCode = (int)HttpStatusCode.Created;
+            Response.Headers.Add("Location", Url.Link(nameof(GetById), new { id = pessoa.Id }));
+
+            return StatusCode((int)HttpStatusCode.Created);
         }
         catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
         {

@@ -22,7 +22,7 @@ namespace Models
         public required string Nome { get; set; }
 
         [Required(ErrorMessage = "A data de nascimento é obrigatória")]
-        public DateTime Nascimento { get; set; }
+        public DateOnly Nascimento { get; set; }
 
         [JsonIgnore]
         public JsonDocument StacksDb { get; set; } = JsonDocument.Parse("[]");
