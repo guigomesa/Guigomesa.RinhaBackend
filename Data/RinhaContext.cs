@@ -16,9 +16,11 @@ namespace Data {
             optionsBuilder.UseNpgsql(configuration.GetConnectionString("RinhaContext"));
         }
 
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Pessoa>().ToTable("Pessoas")
+            modelBuilder.Entity<Pessoa>()
+            .ToTable("Pessoas")
             .HasIndex("Apelido").IsUnique();
         }
     }
