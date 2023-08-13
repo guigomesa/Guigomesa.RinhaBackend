@@ -30,32 +30,6 @@ public class PessoasController : ControllerBase
         return await Listar(termo);
     }
     
-
-
-    // [HttpGet("{id:guid}", Name="GetById")]
-    // [HttpGet("", Name="GetByTermo")]
-    // public async Task<ActionResult> Get([FromQuery] string? termo = null, [FromRoute]Guid? id = null)
-    // {
-    //     try
-    //     {
-    //         if (id.HasValue && id.Value != Guid.Empty)
-    //         {
-    //             return await BuscarPorGuid(id.Value);
-    //         }
-    //         if (!string.IsNullOrEmpty(termo))
-    //         {
-    //             return await Listar(termo);
-    //         }
-
-    //         return StatusCode((int)HttpStatusCode.MethodNotAllowed);
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         return StatusCode(500, ex.Message);
-    //     }
-
-    // }
-
     private async Task<ActionResult> BuscarPorGuid(Guid id)
     {
         var pessoa = await Context.Pessoas.FindAsync(id);
@@ -86,19 +60,20 @@ public class PessoasController : ControllerBase
                 p.""Id"",
                 p.""Apelido"",
                 p.""Nome"",
-                p.""Nascimento"",
-                p.""StacksDb"" as ""StacksQuery""
+                p.""Nascimento"" as NascimentoQuery,
+                p.""StacksDb""::text as ""StacksQuery""
              from public.""Pessoas"" p
             where p.""Nome"" ilike @termo
             or p.""Apelido"" ilike @termo
             or p.""StacksDb""::jsonb @> @jsonTermo::jsonb
             limit 50
         ";
-        //    or p.""StacksDb"" @> @jsonTermo
 
-            var jsonTermo = $@"[""{termo}""]";
             var command = new CommandDefinition(QUERY,
-                new { termo, jsonTermo },
+                new { 
+                    termo=$"%{termo}%",
+                    jsonTermo=$@"[""{termo}""]"
+                     },
                 transaction,
                 commandTimeout: commandTimeout);
 

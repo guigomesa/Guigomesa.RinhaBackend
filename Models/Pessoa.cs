@@ -39,6 +39,11 @@ namespace Models
         }
 
         [NotMapped, JsonIgnore]
+        public DateTime NascimentoQuery {
+            set => Nascimento = DateOnly.FromDateTime(value);
+        }
+
+        [NotMapped, JsonIgnore]
         public string StacksQuery
         {
             set
