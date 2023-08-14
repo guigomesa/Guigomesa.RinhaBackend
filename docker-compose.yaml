@@ -14,7 +14,7 @@ services:
       resources:
         limits:
           cpus: '0.25'
-          memory: '0.5GB'
+          memory: '0.25GB'
   api2: # API - Instância 01
     image: guigomesa/guigomesa.rinhabackend:latest
     environment:
@@ -29,7 +29,7 @@ services:
       resources:
         limits:
           cpus: '0.25'
-          memory: '0.5GB'
+          memory: '0.25GB'
   nginx: # Load Balancer
     image: nginx:latest
     volumes:
@@ -56,8 +56,18 @@ services:
    deploy:
       resources:
         limits:
-          cpus: '0.75'
+          cpus: '0.50'
           memory: '1.5GB'
+  redis:
+    image: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: '1GB'
 networks:
   default:
     driver: bridge

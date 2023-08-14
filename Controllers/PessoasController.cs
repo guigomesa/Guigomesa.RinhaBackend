@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using System.Data.Common;
 using Dapper;
 using System.Net;
+using Services;
+using Cache;
 
 namespace Guigomesa.RinhaBackend.Controllers;
 
@@ -13,16 +15,18 @@ namespace Guigomesa.RinhaBackend.Controllers;
 public class PessoasController : ControllerBase
 {
     public RinhaContext Context { get; set; }
+    public CacheMemoria Cache { get; set; }
 
-    public PessoasController(RinhaContext context)
+    public PessoasController(RinhaContext context, CacheMemoria cache)
     {
         Context = context;
+        Cache = cache;
     }
-
+ 
     [HttpGet("{id}", Name = nameof(GetById))]
     public async Task<ActionResult> GetById([FromRoute] Guid id)
     {
-        return await BuscarPorGuid(id);
+       return await BuscarPorGuid(id);
     }
 
     [HttpGet("", Name = nameof(GetByTermo))]
@@ -33,12 +37,22 @@ public class PessoasController : ControllerBase
 
     private async Task<ActionResult> BuscarPorGuid(Guid id)
     {
+        var pessoaCache = await Cache.Get<PessoaCache>($"pessoa_{id}");
+        if (pessoaCache != null)
+        {
+            return Ok(pessoaCache);
+        }
+
         var pessoa = await Context.Pessoas.FindAsync(id);
         if (pessoa == null)
         {
             return NotFound();
         }
-        return Ok(pessoa);
+
+        pessoaCache = PessoaCache.ToCache(pessoa);
+        await Cache.Set($"pessoa_{id}", pessoaCache, TimeSpan.FromMinutes(1));
+
+        return Ok(pessoaCache);
     }
 
     private async Task<ActionResult> Listar(string termo)
@@ -47,8 +61,11 @@ public class PessoasController : ControllerBase
         DbTransaction transaction = null;
         try
         {
-            var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
-            var logger = loggerFactory.CreateLogger("SQLLogger");
+            var cacheado = await Cache.Get<List<PessoaCache>>($"pessoas_termo_{termo}");
+            if(cacheado!= null && cacheado.Any())
+            {
+                return Ok(cacheado);
+            }
 
             connection = Context.Database.GetDbConnection();
             await connection.OpenAsync();
@@ -85,6 +102,9 @@ public class PessoasController : ControllerBase
                 return NotFound();
             }
 
+            var pessoasCache = pessoas.Select(x => PessoaCache.ToCache(x)).ToList();
+            await Cache.Set($"pessoas_termo_{termo}", pessoasCache, TimeSpan.FromMinutes(1));
+
             return Ok(pessoas);
         }
         finally
@@ -114,15 +134,16 @@ public class PessoasController : ControllerBase
             Response.StatusCode = (int)HttpStatusCode.Created;
             Response.Headers.Add("Location", Url.Link(nameof(GetById), new { id = pessoa.Id }));
 
+            await Cache.Set($"pessoa_{pessoa.Id}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(1));
             return StatusCode((int)HttpStatusCode.Created);
         }
         catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
         {
             if (ex.InnerException is Npgsql.PostgresException pgEx && pgEx.SqlState == "23505")
             {
-                return Conflict("Já existe uma pessoa com este apelido");
+                return BadRequest("Já existe uma pessoa com este apelido");
             }
-            return Conflict(ex.InnerException?.Message ?? ex.Message);
+            return BadRequest(ex.InnerException?.Message ?? ex.Message);
         }
 
     }
