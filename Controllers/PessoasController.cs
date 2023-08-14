@@ -28,14 +28,14 @@ public class PessoasController : ControllerBase
     {
         if (id == Guid.Empty)
         {
-            return BadRequest("O id não pode ser vazio");
+            return NotFound("Id não encontrado");
         }
 
        return await BuscarPorGuid(id);
     }
 
     [HttpGet("", Name = nameof(GetByTermo))]
-    public async Task<ActionResult> GetByTermo([FromQuery] string termo)
+    public async Task<ActionResult> GetByTermo([FromQuery] string termo = "")
     {
         if (string.IsNullOrWhiteSpace(termo))
         {
@@ -111,8 +111,8 @@ public class PessoasController : ControllerBase
                 return Ok();
             }
 
-            var pessoasCache = pessoas.Select(x => PessoaCache.ToCache(x)).ToList();
-            await Cache.Set($"pessoas_termo_{termo}", pessoasCache, TimeSpan.FromMinutes(1));
+            var pessoasCache = pessoas.Select(PessoaCache.ToCache).ToList();
+            await Cache.Set($"pessoas_termo_{termo}", pessoasCache, TimeSpan.FromSeconds(2));
 
             return Ok(pessoas);
         }
