@@ -26,12 +26,21 @@ public class PessoasController : ControllerBase
     [HttpGet("{id}", Name = nameof(GetById))]
     public async Task<ActionResult> GetById([FromRoute] Guid id)
     {
+        if (id == Guid.Empty)
+        {
+            return BadRequest("O id não pode ser vazio");
+        }
+        
        return await BuscarPorGuid(id);
     }
 
     [HttpGet("", Name = nameof(GetByTermo))]
     public async Task<ActionResult> GetByTermo([FromQuery] string termo)
     {
+        if (string.IsNullOrWhiteSpace(termo))
+        {
+            return BadRequest("O termo de busca não pode ser vazio");
+        }
         return await Listar(termo);
     }
 
