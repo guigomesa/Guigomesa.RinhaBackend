@@ -30,7 +30,7 @@ public class PessoasController : ControllerBase
         {
             return BadRequest("O id não pode ser vazio");
         }
-        
+
        return await BuscarPorGuid(id);
     }
 
@@ -108,7 +108,7 @@ public class PessoasController : ControllerBase
 
             if (pessoas == null || !pessoas.Any())
             {
-                return NotFound();
+                return Ok();
             }
 
             var pessoasCache = pessoas.Select(x => PessoaCache.ToCache(x)).ToList();
