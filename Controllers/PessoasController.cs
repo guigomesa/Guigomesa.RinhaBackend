@@ -9,7 +9,7 @@ using System.Net;
 namespace Guigomesa.RinhaBackend.Controllers;
 
 [ApiController]
-[Route("Pessoas")]
+[Route("pessoas")]
 public class PessoasController : ControllerBase
 {
     public RinhaContext Context { get; set; }
@@ -125,11 +125,5 @@ public class PessoasController : ControllerBase
             return Conflict(ex.InnerException?.Message ?? ex.Message);
         }
 
-    }
-
-    [HttpGet("contagem-pessoas")]
-    public async Task<ActionResult> ContagemPessoas()
-    {
-        return Ok(await Context.Pessoas.CountAsync());
     }
 }
