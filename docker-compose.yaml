@@ -4,6 +4,7 @@ services:
     image: guigomesa/guigomesa.rinhabackend:latest
     environment:
       - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__RinhaContext=Host=db;Port=5432;Database=rinha;Username=guigo;Password=rinha123
     hostname: api1
     depends_on:
       - db
@@ -18,6 +19,7 @@ services:
     image: guigomesa/guigomesa.rinhabackend:latest
     environment:
       - ASPNETCORE_URLS=http://+:5000
+      - ConnectionStrings__RinhaContext=Host=db;Port=5432;Database=rinha;Username=guigo;Password=rinha123
     hostname: api2
     depends_on:
       - db
@@ -44,8 +46,9 @@ services:
           memory: '0.5GB'
   db: # Banco de dados
    image: postgres
+   hostname: db
    environment:
-    - POSTGRES_PASSWORD=123
+    - POSTGRES_PASSWORD=rinha123
     - POSTGRES_USER=guigo
     - POSTGRES_DB=rinha
    volumes:

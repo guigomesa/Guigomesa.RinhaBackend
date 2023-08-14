@@ -19,6 +19,7 @@ public class ContagemPessoas : ControllerBase
     [HttpGet("")]
     public async Task<ActionResult> Get()
     {
-        return Ok(await Context.Pessoas.CountAsync());
+        var total = await Context.Pessoas.CountAsync();
+        return Ok(total);
     }
 }
