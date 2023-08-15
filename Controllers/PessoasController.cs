@@ -35,13 +35,13 @@ public class PessoasController : ControllerBase
     }
 
     [HttpGet("", Name = nameof(GetByTermo))]
-    public async Task<ActionResult> GetByTermo([FromQuery] string termo = "")
+    public async Task<ActionResult> GetByTermo([FromQuery] string t = "")
     {
-        if (string.IsNullOrWhiteSpace(termo))
+        if (string.IsNullOrWhiteSpace(t))
         {
             return BadRequest("O termo de busca não pode ser vazio");
         }
-        return await Listar(termo);
+        return await Listar(t);
     }
 
     private async Task<ActionResult> BuscarPorGuid(Guid id)
@@ -66,16 +66,16 @@ public class PessoasController : ControllerBase
 
     private async Task<ActionResult> Listar(string termo)
     {
-        DbConnection connection = null;
-        DbTransaction transaction = null;
-        try
-        {
-            var cacheado = await Cache.Get<List<PessoaCache>>($"pessoas_termo_{termo}");
+         var cacheado = await Cache.Get<List<PessoaCache>>($"pessoas_termo_{termo}");
             if(cacheado!= null && cacheado.Any())
             {
                 return Ok(cacheado);
             }
 
+        DbConnection connection = null;
+        DbTransaction transaction = null;
+        try
+        {
             connection = Context.Database.GetDbConnection();
             await connection.OpenAsync();
             transaction = await connection.BeginTransactionAsync();
@@ -111,10 +111,14 @@ public class PessoasController : ControllerBase
                 return Ok();
             }
 
-            var pessoasCache = pessoas.Select(PessoaCache.ToCache).ToList();
-            await Cache.Set($"pessoas_termo_{termo}", pessoasCache, TimeSpan.FromSeconds(2));
+             var pessoasCache = pessoas.Select(PessoaCache.ToCache).ToList();
+            await Cache.Set($"pessoas_termo_{termo}", pessoasCache, TimeSpan.FromSeconds(5));
 
             return Ok(pessoas);
+        }
+        catch(Exception ex)
+        {
+            return Ok();
         }
         finally
         {
