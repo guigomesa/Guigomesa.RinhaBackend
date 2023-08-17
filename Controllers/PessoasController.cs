@@ -148,13 +148,15 @@ public class PessoasController : ControllerBase
             }
 
             await Context.Pessoas.AddAsync(pessoa);
+            await Cache.Set($"pessoa_{pessoa.Id}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(1));
+            await Cache.Set($"pessoa_{pessoa.Apelido}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(5));
+
             await Context.SaveChangesAsync();
 
             Response.StatusCode = (int)HttpStatusCode.Created;
             Response.Headers.Add("Location", Url.Link(nameof(GetById), new { id = pessoa.Id }));
 
-            await Cache.Set($"pessoa_{pessoa.Id}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(1));
-            await Cache.Set($"pessoa_{pessoa.Apelido}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(5));
+            
             return StatusCode((int)HttpStatusCode.Created);
         }
         catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
