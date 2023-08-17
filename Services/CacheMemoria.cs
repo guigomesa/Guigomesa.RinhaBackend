@@ -1,6 +1,7 @@
 
 using Microsoft.Extensions.Caching.Distributed;
 using System;
+using System.Runtime.Remoting;
 using System.Text.Json;
 
 namespace Services;
@@ -21,6 +22,12 @@ public class CacheMemoria {
             return null;
         }
         return JsonSerializer.Deserialize<T>(value);
+    }
+
+    public async Task<bool> Exist(string key) {
+        var obj = await Cache.GetAsync(key);
+
+        return obj!= null;
     }
 
     public async Task Set<T>(string key, T value, TimeSpan? timeToLive = null) where T : class

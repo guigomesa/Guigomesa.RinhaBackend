@@ -59,6 +59,7 @@ public class PessoasController : ControllerBase
         }
 
         pessoaCache = PessoaCache.ToCache(pessoa);
+        await Cache.Set($"pessoa_{pessoa.Apelido}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(5));
         await Cache.Set($"pessoa_{id}", pessoaCache, TimeSpan.FromMinutes(1));
 
         return Ok(pessoaCache);
@@ -141,6 +142,11 @@ public class PessoasController : ControllerBase
     {
         try
         {
+            if (await Cache.Exist($"pessoa_{pessoa.Apelido}"))
+            {
+                return BadRequest("Já existe uma pessoa com este apelido");
+            }
+
             await Context.Pessoas.AddAsync(pessoa);
             await Context.SaveChangesAsync();
 
@@ -148,6 +154,7 @@ public class PessoasController : ControllerBase
             Response.Headers.Add("Location", Url.Link(nameof(GetById), new { id = pessoa.Id }));
 
             await Cache.Set($"pessoa_{pessoa.Id}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(1));
+            await Cache.Set($"pessoa_{pessoa.Apelido}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(5));
             return StatusCode((int)HttpStatusCode.Created);
         }
         catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
