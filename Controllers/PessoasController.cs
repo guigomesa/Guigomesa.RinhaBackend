@@ -147,15 +147,17 @@ public class PessoasController : ControllerBase
                 return BadRequest("Já existe uma pessoa com este apelido");
             }
 
-            await Context.Pessoas.AddAsync(pessoa);
-            await Cache.Set($"pessoa_{pessoa.Id}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(1));
-            await Cache.Set($"pessoa_{pessoa.Apelido}", PessoaCache.ToCache(pessoa), TimeSpan.FromMinutes(5));
+            var pessoaCache = PessoaCache.ToCache(pessoa);
+            // await Context.Pessoas.AddAsync(pessoa);
+            await Cache.Set($"pessoa_{pessoa.Id}", pessoaCache, TimeSpan.FromMinutes(1));
+            await Cache.Set($"pessoa_{pessoa.Apelido}", pessoaCache, TimeSpan.FromMinutes(5));
 
-            await Context.SaveChangesAsync();
+            // await Context.SaveChangesAsync();
 
             Response.StatusCode = (int)HttpStatusCode.Created;
             Response.Headers.Add("Location", Url.Link(nameof(GetById), new { id = pessoa.Id }));
 
+            Hangfire.BackgroundJob.Enqueue<Processamento>(x => x.SalvarPessoa(pessoaCache));
             
             return StatusCode((int)HttpStatusCode.Created);
         }

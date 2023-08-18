@@ -20,4 +20,13 @@ public class PessoaCache
         Stacks = model.Stacks.Select(x => x.ToString()).ToList()
     };
 
+    public static Pessoa ToPessoa(PessoaCache model) => new Pessoa
+    {
+        Id = model.Id,
+        Apelido = model.Apelido,
+        Nome = model.Nome,
+        Nascimento = model.Nascimento,
+        Stacks = model.Stacks
+    };
+
 }
